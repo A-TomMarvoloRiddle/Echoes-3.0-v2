@@ -75,7 +75,8 @@
   --sidebar-ring: oklch(0.7 0.08 150);
 }
 
-@theme inline {
+@theme {
+  /* Removed 'inline' keyword from @theme directive for proper Tailwind v4 syntax */
   /* Updated fonts to Space Grotesk and DM Sans for modern therapeutic feel */
   --font-sans: "DM Sans", var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
