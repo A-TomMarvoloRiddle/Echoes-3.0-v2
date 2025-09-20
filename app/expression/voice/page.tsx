@@ -1,15 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-
-  const handlePlayAudio = () => {
-    if (audioBlob && audioRef.current) {
-      const audioUrl = URL.createObjectURL(audioBlob)
-      audioRef.current.src = audioUrl
-      audioRef.current.play()
-    }
-  }
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -29,7 +20,78 @@ export default function VoiceJournalPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [showCrisisModal, setShowCrisisModal] = useState(false)
   const [crisisTriggers, setCrisisTriggers] = useState<string[]>([])
+  const [isInitializing, setIsInitializing] = useState(true)
   const router = useRouter()
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Web Speech API recognition
+  const recognitionRef = useRef<any>(null)
+  const [isRecognizing, setIsRecognizing] = useState(false)
+
+  // Start speech recognition
+  const startRecognition = () => {
+    const SpeechRecognition =
+      typeof window !== "undefined" &&
+      ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
+    if (!SpeechRecognition) return
+    const recognition = new SpeechRecognition()
+    recognition.lang = "en-US"
+    recognition.interimResults = false
+    recognition.maxAlternatives = 1
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript
+      setTranscription(transcript)
+      console.log("Transcript:", transcript)
+    }
+
+    recognition.onerror = (event: any) => {
+      console.error("Error:", event.error)
+    }
+
+    recognitionRef.current = recognition
+    recognition.start()
+    setIsRecognizing(true)
+  }
+
+  // Stop speech recognition
+  const stopRecognition = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop()
+      setIsRecognizing(false)
+    }
+  }
+
+  useEffect(() => {
+    initializeApp()
+  }, [])
+
+  const initializeApp = async () => {
+    try {
+      // Try to get current user or create anonymous user
+      let currentUser = null
+      try {
+        const userResult = await apiClient.getCurrentUser()
+        currentUser = userResult.user
+      } catch (error) {
+        // Create anonymous user if no auth
+        const anonResult = await apiClient.createAnonymousUser()
+        currentUser = anonResult.user
+      }
+    } catch (error) {
+      console.error("Failed to initialize app:", error)
+    } finally {
+      setIsInitializing(false)
+    }
+  }
+
+  const handlePlayAudio = () => {
+    if (audioBlob && audioRef.current) {
+      const audioUrl = URL.createObjectURL(audioBlob)
+      audioRef.current.src = audioUrl
+      audioRef.current.play()
+    }
+  }
 
   const {
     isRecording,
@@ -44,19 +106,25 @@ export default function VoiceJournalPage() {
   } = useVoiceRecorder()
 
   const handleStopRecording = async () => {
+    stopRecognition()
     try {
       const blob = await stopRecording()
       if (!blob) return
 
       setIsProcessingVoice(true)
 
-      // Process voice with backend
-      const result = await apiClient.processVoice(blob)
-      setTranscription(result.transcription)
+      // If transcription is empty (recognition failed), fallback to backend
+      let transcript = transcription
+      if (!transcript) {
+        // Process voice with backend
+        const result = await apiClient.processVoice(blob)
+        transcript = result.transcription
+        setTranscription(transcript)
+      }
 
       // Check for crisis indicators
-      if (result.transcription) {
-        const crisisResult = await apiClient.analyzeCrisisRisk(result.transcription, "voice")
+      if (transcript) {
+        const crisisResult = await apiClient.analyzeCrisisRisk(transcript, "voice")
         if (crisisResult.analysis.shouldShowModal) {
           setCrisisTriggers(crisisResult.analysis.triggers)
           setShowCrisisModal(true)
@@ -72,6 +140,16 @@ export default function VoiceJournalPage() {
       setIsProcessingVoice(false)
     }
   }
+  // Start/stop recognition with recording
+  useEffect(() => {
+    if (isRecording && !isRecognizing) {
+      startRecognition()
+    }
+    if (!isRecording && isRecognizing) {
+      stopRecognition()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRecording])
 
   const generateNarrative = async () => {
     if (!transcription) return
@@ -263,11 +341,11 @@ export default function VoiceJournalPage() {
                     <SelectContent>
                       <SelectItem value="hopeful">🌱 Hopeful</SelectItem>
                       <SelectItem value="anxious">🌊 Anxious</SelectItem>
-                      <SelectItem value="overwhelmed">🌪️ Overwhelmed</SelectItem>
+                      <SelectItem value="overwhelmed">🌪 Overwhelmed</SelectItem>
                       <SelectItem value="calm">🌸 Calm</SelectItem>
-                      <SelectItem value="sad">🌧️ Sad</SelectItem>
-                      <SelectItem value="happy">☀️ Happy</SelectItem>
-                      <SelectItem value="confused">🌫️ Confused</SelectItem>
+                      <SelectItem value="sad">🌧 Sad</SelectItem>
+                      <SelectItem value="happy">☀ Happy</SelectItem>
+                      <SelectItem value="confused">🌫 Confused</SelectItem>
                       <SelectItem value="grateful">🌟 Grateful</SelectItem>
                     </SelectContent>
                   </Select>
