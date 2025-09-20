@@ -424,7 +424,7 @@ export default function SettingsPage() {
                   Crisis Support Resources
                 </CardTitle>
                 <CardDescription>
-                  If you're in immediate danger, please call 112 (India's emergency number) or your local emergency number immediately
+                  If you're in immediate danger, please call 112 (India's emergency number) immediately
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
