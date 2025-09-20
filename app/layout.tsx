@@ -6,6 +6,7 @@ import { Suspense } from "react"
 import "./globals.css"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { AuthProvider } from "@/hooks/use-auth"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -31,12 +32,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${dmSans.variable} ${spaceGrotesk.variable}`}>
         <ErrorBoundary>
-          <AuthProvider>
-            <Suspense fallback={null}>{children}</Suspense>
-          </AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+          >
+            <AuthProvider>
+              <Suspense fallback={null}>{children}</Suspense>
+            </AuthProvider>
+          </ThemeProvider>
         </ErrorBoundary>
         <Analytics />
       </body>

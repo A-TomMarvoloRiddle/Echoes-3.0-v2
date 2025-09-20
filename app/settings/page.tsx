@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -30,6 +31,7 @@ import {
 import { useRouter } from "next/navigation"
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme()
   const [settings, setSettings] = useState({
     // Privacy & Safety
     anonymousMode: false,
@@ -57,8 +59,50 @@ export default function SettingsPage() {
 
   const router = useRouter()
 
+  // Load saved preferences on component mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("echoes-settings")
+    if (savedSettings) {
+      const parsedSettings = JSON.parse(savedSettings)
+      setSettings(parsedSettings)
+      // Apply the saved theme
+      if (parsedSettings.theme) {
+        setTheme(parsedSettings.theme)
+      }
+    }
+  }, [setTheme])
+
   const updateSetting = (key: string, value: any) => {
-    setSettings((prev) => ({ ...prev, [key]: value }))
+    const newSettings = { ...settings, [key]: value }
+    setSettings(newSettings)
+
+    // Immediately apply theme changes
+    if (key === "theme") {
+      setTheme(value)
+    }
+  }
+
+  const saveSettings = async () => {
+    try {
+      // Save to localStorage
+      localStorage.setItem("echoes-settings", JSON.stringify(settings))
+
+      // TODO: Save to API when user is authenticated
+      // const response = await fetch('/api/auth/preferences', {
+      //   method: 'PUT',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `Bearer ${token}`,
+      //   },
+      //   body: JSON.stringify(settings),
+      // })
+
+      // Show success feedback
+      alert("Settings saved successfully!")
+    } catch (error) {
+      console.error("Failed to save settings:", error)
+      alert("Failed to save settings. Please try again.")
+    }
   }
 
   const crisisResources = [
@@ -513,7 +557,12 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end pt-6">
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8">Save All Settings</Button>
+          <Button
+            onClick={saveSettings}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+          >
+            Save All Settings
+          </Button>
         </div>
       </div>
     </div>
