@@ -1,6 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const handlePlayAudio = () => {
+    if (audioBlob && audioRef.current) {
+      const audioUrl = URL.createObjectURL(audioBlob)
+      audioRef.current.src = audioUrl
+      audioRef.current.play()
+    }
+  }
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -225,6 +234,7 @@ export default function VoiceJournalPage() {
                       size="sm"
                       className="flex items-center gap-2 bg-transparent"
                       disabled={isProcessingVoice}
+                      onClick={handlePlayAudio}
                     >
                       <Play className="h-4 w-4" />
                       Play
@@ -238,6 +248,8 @@ export default function VoiceJournalPage() {
                       <RefreshCw className="h-4 w-4" />
                       Record Again
                     </Button>
+                    {/* Hidden audio element for playback */}
+                    <audio ref={audioRef} style={{ display: "none" }} />
                   </div>
                 )}
 
