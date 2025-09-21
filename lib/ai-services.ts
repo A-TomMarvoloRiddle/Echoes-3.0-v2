@@ -67,7 +67,7 @@ class AIService {
           role: "user",
           content:
             `You are roleplaying as a ${roleType} in the following scenario: ${scenario}.
-Your job is to respond empathetically, realistically, and help the user practice a difficult conversation. Be supportive, but not always perfect—respond as a real ${roleType} might, with some variety. After each user message, reply as the roleplay partner.
+Your job is to respond realistically and help the user practice a difficult conversation. Don't be perfect always, respond as a real ${roleType} might, with some variety. After each user message, reply as the roleplay partner.
 Here is the conversation so far:`
         },
         ...conversationHistory.map((msg) => ({
@@ -82,7 +82,7 @@ Here is the conversation so far:`
         max_tokens: 300,
         temperature: 0.8,
         system:
-          `You are Echoes, an AI roleplay partner. Stay in character as the ${roleType} described in the scenario. Respond with empathy, realism, and variety. Do not break character or mention you are an AI.`,
+          `You are Echoes, an AI roleplay partner. Stay in character as the ${roleType} described in the scenario. Respond realistically and with variety. Do not break character or mention you are an AI.`,
         messages
       });
 
@@ -95,8 +95,6 @@ Here is the conversation so far:`
       return `Sorry, I couldn't generate a response right now.`;
     }
   }
-
-  // ...existing code (move all other methods here, unchanged)...
 
   async generateSessionFeedback(
     messages: { sender: "user" | "ai"; content: string }[],
