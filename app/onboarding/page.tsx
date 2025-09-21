@@ -88,8 +88,8 @@ export default function OnboardingPage() {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      // Complete onboarding
-      router.push("/dashboard")
+      // After onboarding, go to register/login page
+      router.push("/register-login")
     }
   }
 
@@ -109,6 +109,10 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-muted flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
+        {/* Top Register/Login Button */}
+        <div className="flex justify-end mb-2">
+          <Button variant="outline" className="bg-transparent" onClick={() => router.push("/register-login")}>Register / Login</Button>
+        </div>
         {/* Progress Indicator */}
         <div className="flex items-center justify-center mb-8">
           <div className="flex items-center gap-2">
