@@ -292,7 +292,7 @@ export default function OnboardingPage() {
         <div className="mt-8 text-center">
           <p className="text-sm text-muted-foreground">
             If you're in immediate danger, please call{" "}
-            <span className="font-semibold text-destructive">your local emergency number</span>. You are not alone.
+            <span className="font-semibold text-destructive">India's emergency number: 112</span>. You are not alone.
           </p>
         </div>
       </div>

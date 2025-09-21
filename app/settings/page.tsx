@@ -480,7 +480,7 @@ export default function SettingsPage() {
                       <Label htmlFor="local-helpline">Local Helpline</Label>
                       <Input
                         id="local-helpline"
-                        placeholder="Your local crisis helpline number"
+                        placeholder="India's emergency number: 112"
                         value={settings.localHelpline}
                         onChange={(e) => updateSetting("localHelpline", e.target.value)}
                       />
