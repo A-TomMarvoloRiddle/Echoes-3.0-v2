@@ -116,7 +116,7 @@ Echoes is a comprehensive AI platform that empowers youth to face mental health 
 ---
 
 **Other Notes:**
-- **Storage:** Audio files (voice journals) may be stored in cloud storage (e.g., S3, Vercel Blob) with DB reference.
+- **Storage:** Audio files (voice journals) will be stored in cloud storage (e.g., S3, Vercel Blob) with DB reference.
 - **Encryption:** Sensitive fields encrypted at rest.
 - **Deployment:** Vercel (serverless), with environment variables for API keys and DB connection.
 
@@ -137,7 +137,7 @@ Echoes is a comprehensive AI platform that empowers youth to face mental health 
 	3. Set environment variables in Vercel dashboard
 	4. Configure custom domain and SSL (optional)
 - **Storage:**
-	- Audio files (voice journals) can be stored in Vercel Blob, S3, or similar, with DB reference
+	- Audio files (voice journals) will be stored in Vercel Blob, S3, or similar, with DB reference
 - **Monitoring:**
 	- Use Vercel Analytics, Sentry, or similar for error and performance monitoring
 
