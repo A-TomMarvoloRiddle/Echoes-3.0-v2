@@ -68,7 +68,7 @@ export function CrisisModal({ isOpen, onClose, triggerWords = [] }: CrisisModalP
               If you're in immediate danger
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Please call 911 (US) or your local emergency number right away. Your life matters.
+              Please call 112 (India's emergency number) right away. Your life matters.
             </p>
             <Button className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground">
               <Phone className="mr-2 h-4 w-4" />
