@@ -1,3 +1,5 @@
+import Anthropic from '@anthropic-ai/sdk'
+
 // AI services for narrative generation and roleplay
 export interface NarrativeRequest {
   content: string
@@ -13,41 +15,55 @@ export interface RoleplayContext {
 }
 
 export class AIService {
+  private anthropic: Anthropic | null = null
+
+  constructor() {
+    // Initialize Anthropic client if API key is available (server-side only)
+    if (typeof window === 'undefined') {
+      const apiKey = process.env.ANTHROPIC_API_KEY
+      if (apiKey) {
+        this.anthropic = new Anthropic({ apiKey })
+      }
+    }
+  }
+
   // Generate healing narrative from journal content
   async generateNarrative(request: NarrativeRequest): Promise<string> {
     const { content, mood, emotions, type } = request
 
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
-
-    const moodDescriptor = this.getMoodDescriptor(mood)
-    const emotionContext = emotions.length > 0 ? emotions.join(", ") : "mixed feelings"
-
-    const narrativeTemplates = {
-      voice: [
-        `Your voice carries the weight of ${emotionContext}, and that's completely valid. In this moment of ${moodDescriptor}, you're showing incredible courage by expressing yourself. Every word you've shared is a step toward understanding yourself better.`,
-        `I hear the ${emotionContext} in your voice, and it tells a story of someone who is navigating life with authenticity. Your ${moodDescriptor} feelings are not obstacles—they're guideposts showing you what matters most to your heart.`,
-        `The emotions you've shared—${emotionContext}—paint a picture of someone who feels deeply. In your ${moodDescriptor} state, you're still choosing to reach out and express yourself, which shows remarkable strength.`,
-      ],
-      text: [
-        `Your words reveal a journey through ${emotionContext}, and each sentence shows your willingness to explore your inner world. Even in moments of ${moodDescriptor}, you're creating space for growth and self-discovery.`,
-        `Reading your thoughts, I see someone processing ${emotionContext} with honesty and vulnerability. Your ${moodDescriptor} experience is part of a larger story of resilience and self-awareness that you're writing every day.`,
-        `The way you've articulated your ${emotionContext} shows deep emotional intelligence. Your ${moodDescriptor} feelings are valid messengers, helping you understand what you need right now.`,
-      ],
-      doodle: [
-        `Your creative expression speaks volumes about your inner world. The emotions of ${emotionContext} flow through your art, creating something beautiful from your ${moodDescriptor} experience. Art has a way of healing that words sometimes cannot reach.`,
-        `In your doodles, I see the visual language of ${emotionContext}. Your ${moodDescriptor} feelings have found a creative outlet, transforming internal experiences into external beauty. This is your unique way of processing and healing.`,
-        `Your artistic expression captures the essence of ${emotionContext} in a way that's uniquely yours. Even in ${moodDescriptor} moments, you're creating something meaningful—a testament to your creative spirit and resilience.`,
-      ],
+    // Fallback to mock if no API key or client not initialized
+    if (!this.anthropic) {
+      console.warn('Anthropic API key not found, falling back to mock narrative')
+      return this.generateMockNarrative(request)
     }
 
-    const templates = narrativeTemplates[type]
-    const selectedTemplate = templates[Math.floor(Math.random() * templates.length)]
+    try {
+      const prompt = this.buildNarrativePrompt(content, mood, emotions, type)
 
-    // Add personalized elements based on content analysis
-    const personalizedEnding = this.generatePersonalizedEnding(content, mood)
+      const response = await this.anthropic.messages.create({
+        model: "claude-3-sonnet-20240229",
+        max_tokens: 400,
+        temperature: 0.7,
+        system: "You are a compassionate AI therapist and mental health companion. Your role is to help users process their emotions through personalized, empathetic narratives. Always respond with kindness, validation, and gentle insights. Focus on emotional healing, self-compassion, and growth.",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
+      })
 
-    return `${selectedTemplate}\n\n${personalizedEnding}`
+      const generatedText = response.content[0].text
+
+      // Add a small delay to maintain consistent UX
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      return generatedText
+    } catch (error) {
+      console.error('Anthropic API error:', error)
+      // Fallback to mock narrative on API error
+      return this.generateMockNarrative(request)
+    }
   }
 
   // Generate AI roleplay response
@@ -222,6 +238,62 @@ export class AIService {
     }
 
     return detected
+  }
+
+  private buildNarrativePrompt(content: string, mood: number, emotions: string[], type: string): string {
+    const moodDescriptor = this.getMoodDescriptor(mood)
+    const emotionContext = emotions.length > 0 ? emotions.join(", ") : "mixed emotions"
+
+    return `Create a healing, therapeutic narrative based on this ${type} journal entry:
+
+Content: "${content}"
+Current mood level (1-10): ${mood} (${moodDescriptor})
+Emotions detected: ${emotionContext}
+
+Please create a personalized, empathetic response that:
+1. Acknowledges their current emotional state with compassion
+2. Validates their feelings as completely normal and understandable
+3. Provides gentle insights or perspectives that might help them process their experience
+4. Ends with encouragement and hope for their healing journey
+5. Keeps the tone supportive, non-judgmental, and therapeutic
+
+Write this as a cohesive narrative paragraph that feels like it's coming from a caring mental health companion.`
+  }
+
+  private async generateMockNarrative(request: NarrativeRequest): Promise<string> {
+    const { content, mood, emotions, type } = request
+
+    // Simulate AI processing delay
+    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
+
+    const moodDescriptor = this.getMoodDescriptor(mood)
+    const emotionContext = emotions.length > 0 ? emotions.join(", ") : "mixed feelings"
+
+    const narrativeTemplates = {
+      voice: [
+        `Your voice carries the weight of ${emotionContext}, and that's completely valid. In this moment of ${moodDescriptor}, you're showing incredible courage by expressing yourself. Every word you've shared is a step toward understanding yourself better.`,
+        `I hear the ${emotionContext} in your voice, and it tells a story of someone who is navigating life with authenticity. Your ${moodDescriptor} feelings are not obstacles—they're guideposts showing you what matters most to your heart.`,
+        `The emotions you've shared—${emotionContext}—paint a picture of someone who feels deeply. In your ${moodDescriptor} state, you're still choosing to reach out and express yourself, which shows remarkable strength.`,
+      ],
+      text: [
+        `Your words reveal a journey through ${emotionContext}, and each sentence shows your willingness to explore your inner world. Even in moments of ${moodDescriptor}, you're creating space for growth and self-discovery.`,
+        `Reading your thoughts, I see someone processing ${emotionContext} with honesty and vulnerability. Your ${moodDescriptor} experience is part of a larger story of resilience and self-awareness that you're writing every day.`,
+        `The way you've articulated your ${emotionContext} shows deep emotional intelligence. Your ${moodDescriptor} feelings are valid messengers, helping you understand what you need right now.`,
+      ],
+      doodle: [
+        `Your creative expression speaks volumes about your inner world. The emotions of ${emotionContext} flow through your art, creating something beautiful from your ${moodDescriptor} experience. Art has a way of healing that words sometimes cannot reach.`,
+        `In your doodles, I see the visual language of ${emotionContext}. Your ${moodDescriptor} feelings have found a creative outlet, transforming internal experiences into external beauty. This is your unique way of processing and healing.`,
+        `Your artistic expression captures the essence of ${emotionContext} in a way that's uniquely yours. Even in ${moodDescriptor} moments, you're creating something meaningful—a testament to your creative spirit and resilience.`,
+      ],
+    }
+
+    const templates = narrativeTemplates[type]
+    const selectedTemplate = templates[Math.floor(Math.random() * templates.length)]
+
+    // Add personalized elements based on content analysis
+    const personalizedEnding = this.generatePersonalizedEnding(content, mood)
+
+    return `${selectedTemplate}\n\n${personalizedEnding}`
   }
 }
 
