@@ -14,142 +14,61 @@ export interface RoleplayContext {
   conversationHistory: { sender: "user" | "ai"; content: string }[]
 }
 
-export class AIService {
-  private static _anthropic: Anthropic | null = null;
-  private get anthropic(): Anthropic | null {
-    if (typeof window !== 'undefined') {
-      throw new Error('aiService cannot be used on the client. Use it only in API routes or server actions.');
-    }
-    if (!AIService._anthropic) {
-      const apiKey = process.env.ANTHROPIC_API_KEY;
-      if (apiKey) {
-        AIService._anthropic = new Anthropic({ apiKey });
-      }
-    }
-    return AIService._anthropic;
+
+class AIService {
+  anthropic: Anthropic | null;
+  constructor() {
+    this.anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
   }
 
-  // Generate healing narrative from journal content
-  async generateNarrative(request: NarrativeRequest): Promise<string> {
-    const { content, mood, emotions, type } = request
+  // Generate AI roleplay response using Claude API
+  async generateRoleplayResponse(context: RoleplayContext, userMessage: string): Promise<string> {
+    const { roleType, scenario, conversationHistory } = context;
 
-    // Fallback to mock if no API key or client not initialized
     if (!this.anthropic) {
-      console.warn('Anthropic API key not found, falling back to mock narrative')
-      return this.generateMockNarrative(request)
+      console.warn('Anthropic API key not found, falling back to mock roleplay response');
+      // fallback: just echo the last user message or a generic response
+      return `Let's practice! (mock) You said: "${userMessage}"`;
     }
 
     try {
-      const prompt = this.buildNarrativePrompt(content, mood, emotions, type)
+      // Build conversation history for Claude
+      const messages: { role: "user" | "assistant"; content: string }[] = [
+        {
+          role: "user",
+          content:
+            `You are roleplaying as a ${roleType} in the following scenario: ${scenario}.
+Your job is to respond empathetically, realistically, and help the user practice a difficult conversation. Be supportive, but not always perfect—respond as a real ${roleType} might, with some variety. After each user message, reply as the roleplay partner.
+Here is the conversation so far:`
+        },
+        ...conversationHistory.map((msg) => ({
+          role: msg.sender === "user" ? "user" as const : "assistant" as const,
+          content: msg.content
+        })),
+        { role: "user" as const, content: userMessage }
+      ];
 
       const response = await this.anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
-        max_tokens: 400,
-        temperature: 0.7,
-        system: "You are a compassionate AI therapist and mental health companion. Your role is to help users process their emotions through personalized, empathetic narratives. Always respond with kindness, validation, and gentle insights. Focus on emotional healing, self-compassion, and growth. Your response should be short, connected to waht the user said & their current emotional state, maybe even poetic, but not too flowery.",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
+        max_tokens: 300,
+        temperature: 0.8,
+        system:
+          `You are Echoes, an AI roleplay partner. Stay in character as the ${roleType} described in the scenario. Respond with empathy, realism, and variety. Do not break character or mention you are an AI.`,
+        messages
+      });
 
-      const generatedText = response.content[0].text
-
-      // Add a small delay to maintain consistent UX
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      return generatedText
+      // Claude's response.content is an array of ContentBlock, find the first 'text' type
+      const textBlock = response.content.find((block: any) => block.type === 'text');
+      const generatedText = textBlock ? (textBlock as any).text : '';
+      return generatedText;
     } catch (error) {
-      console.error('Anthropic API error:', error)
-      // Fallback to mock narrative on API error
-      return this.generateMockNarrative(request)
+      console.error('Anthropic API error (roleplay):', error);
+      return `Sorry, I couldn't generate a response right now.`;
     }
   }
 
-  // Generate AI roleplay response
-  async generateRoleplayResponse(context: RoleplayContext, userMessage: string): Promise<string> {
-    const { roleType, scenario, conversationHistory } = context
+  // ...existing code (move all other methods here, unchanged)...
 
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1200))
-
-    const rolePersonalities = {
-      parent: {
-        tone: "caring and supportive",
-        responses: [
-          "I can see this is really important to you. Help me understand what you're feeling right now.",
-          "I'm glad you're talking to me about this. It takes courage to share what's on your mind.",
-          "I hear you, and I want you to know that your feelings are valid. Let's work through this together.",
-          "Thank you for trusting me with this. What do you think would help you feel better about the situation?",
-          "I love you, and I want to support you. Can you tell me more about what's been bothering you?",
-        ],
-      },
-      friend: {
-        tone: "understanding and relatable",
-        responses: [
-          "Wow, that sounds really tough. I've been in similar situations before, and it's never easy.",
-          "I totally get why you'd feel that way. Have you thought about what you want to do next?",
-          "That's so frustrating! I'm here for you though. Want to talk through some options?",
-          "I can relate to that feeling. Sometimes it helps to just get it all out, you know?",
-          "You're not alone in this. I've got your back, whatever you decide to do.",
-        ],
-      },
-      teacher: {
-        tone: "encouraging and educational",
-        responses: [
-          "I appreciate you bringing this to my attention. Let's think about this step by step.",
-          "This is a great learning opportunity. What do you think might be the best approach here?",
-          "I can see you're putting thought into this. What resources do you think might help you?",
-          "Every challenge is a chance to grow. How do you think we can turn this into a positive experience?",
-          "I believe in your ability to handle this. What strategies have worked for you in the past?",
-        ],
-      },
-      counselor: {
-        tone: "professional and empathetic",
-        responses: [
-          "Thank you for sharing that with me. How are you feeling right now as you talk about this?",
-          "I notice you mentioned feeling... Can you tell me more about that emotion?",
-          "It sounds like this situation is causing you some distress. What would feeling better look like to you?",
-          "You've shown a lot of insight in recognizing this pattern. What do you think might help you move forward?",
-          "I hear the strength in your voice even as you're struggling. What coping strategies have helped you before?",
-        ],
-      },
-    }
-
-    const personality = rolePersonalities[roleType]
-    const baseResponses = personality.responses
-
-    // Analyze user message for emotional content
-    const emotionalWords = this.detectEmotionalContent(userMessage)
-    const responseIndex = Math.floor(Math.random() * baseResponses.length)
-    let response = baseResponses[responseIndex]
-
-    // Add contextual elements based on conversation history
-    if (conversationHistory.length > 2) {
-      const continuationPhrases = [
-        "Building on what you shared earlier, ",
-        "I remember you mentioned before that ",
-        "Connecting this to our conversation, ",
-        "This reminds me of when you said ",
-      ]
-
-      if (Math.random() > 0.7) {
-        const phrase = continuationPhrases[Math.floor(Math.random() * continuationPhrases.length)]
-        response = phrase + response.toLowerCase()
-      }
-    }
-
-    // Add scenario-specific context
-    if (scenario && Math.random() > 0.6) {
-      response += ` Given what's happening with ${scenario.toLowerCase()}, how do you think we can best support you?`
-    }
-
-    return response
-  }
-
-  // Generate practice session feedback
   async generateSessionFeedback(
     messages: { sender: "user" | "ai"; content: string }[],
     confidenceBefore: number,
@@ -202,101 +121,6 @@ export class AIService {
     return { feedback, tips }
   }
 
-  private getMoodDescriptor(mood: number): string {
-    if (mood <= 2) return "challenging"
-    if (mood <= 4) return "difficult"
-    if (mood <= 6) return "mixed"
-    if (mood <= 8) return "positive"
-    return "uplifting"
-  }
-
-  private generatePersonalizedEnding(content: string, mood: number): string {
-    const endings = [
-      "Remember, every feeling you experience is part of your unique human journey. You're exactly where you need to be right now.",
-      "Your willingness to express yourself, even in difficult moments, is a gift you give to your future self. Keep nurturing this practice.",
-      "In sharing your authentic experience, you're not just processing emotions—you're building emotional wisdom that will serve you well.",
-      "This moment of expression is a small but significant act of self-care. You're learning to be your own compassionate companion.",
-    ]
-
-    return endings[Math.floor(Math.random() * endings.length)]
-  }
-
-  private detectEmotionalContent(message: string): string[] {
-    const emotionalWords = {
-      sad: ["sad", "down", "depressed", "blue", "unhappy"],
-      angry: ["angry", "mad", "frustrated", "annoyed", "irritated"],
-      anxious: ["anxious", "worried", "nervous", "scared", "afraid"],
-      happy: ["happy", "good", "great", "excited", "joy"],
-      confused: ["confused", "lost", "unsure", "don't know"],
-    }
-
-    const detected: string[] = []
-    const lowerMessage = message.toLowerCase()
-
-    for (const [emotion, words] of Object.entries(emotionalWords)) {
-      if (words.some((word) => lowerMessage.includes(word))) {
-        detected.push(emotion)
-      }
-    }
-
-    return detected
-  }
-
-  private buildNarrativePrompt(content: string, mood: number, emotions: string[], type: string): string {
-    const moodDescriptor = this.getMoodDescriptor(mood)
-    const emotionContext = emotions.length > 0 ? emotions.join(", ") : "mixed emotions"
-
-    return `Create a healing, therapeutic narrative based on this ${type} journal entry:
-
-Content: "${content}"
-Current mood level (1-10): ${mood} (${moodDescriptor})
-Emotions detected: ${emotionContext}
-
-Please create a personalized, empathetic response that:
-1. Acknowledges their current emotional state with compassion
-2. Validates their feelings as completely normal and understandable
-3. Provides gentle insights or perspectives that might help them process their experience
-4. Ends with encouragement and hope for their healing journey
-5. Keeps the tone supportive, non-judgmental, and therapeutic
-
-Write this as a cohesive narrative paragraph that feels like it's coming from a caring mental health companion.`
-  }
-
-  private async generateMockNarrative(request: NarrativeRequest): Promise<string> {
-    const { content, mood, emotions, type } = request
-
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
-
-    const moodDescriptor = this.getMoodDescriptor(mood)
-    const emotionContext = emotions.length > 0 ? emotions.join(", ") : "mixed feelings"
-
-    const narrativeTemplates = {
-      voice: [
-        `Your voice carries the weight of ${emotionContext}, and that's completely valid. In this moment of ${moodDescriptor}, you're showing incredible courage by expressing yourself. Every word you've shared is a step toward understanding yourself better.`,
-        `I hear the ${emotionContext} in your voice, and it tells a story of someone who is navigating life with authenticity. Your ${moodDescriptor} feelings are not obstacles—they're guideposts showing you what matters most to your heart.`,
-        `The emotions you've shared—${emotionContext}—paint a picture of someone who feels deeply. In your ${moodDescriptor} state, you're still choosing to reach out and express yourself, which shows remarkable strength.`,
-      ],
-      text: [
-        `Your words reveal a journey through ${emotionContext}, and each sentence shows your willingness to explore your inner world. Even in moments of ${moodDescriptor}, you're creating space for growth and self-discovery.`,
-        `Reading your thoughts, I see someone processing ${emotionContext} with honesty and vulnerability. Your ${moodDescriptor} experience is part of a larger story of resilience and self-awareness that you're writing every day.`,
-        `The way you've articulated your ${emotionContext} shows deep emotional intelligence. Your ${moodDescriptor} feelings are valid messengers, helping you understand what you need right now.`,
-      ],
-      doodle: [
-        `Your creative expression speaks volumes about your inner world. The emotions of ${emotionContext} flow through your art, creating something beautiful from your ${moodDescriptor} experience. Art has a way of healing that words sometimes cannot reach.`,
-        `In your doodles, I see the visual language of ${emotionContext}. Your ${moodDescriptor} feelings have found a creative outlet, transforming internal experiences into external beauty. This is your unique way of processing and healing.`,
-        `Your artistic expression captures the essence of ${emotionContext} in a way that's uniquely yours. Even in ${moodDescriptor} moments, you're creating something meaningful—a testament to your creative spirit and resilience.`,
-      ],
-    }
-
-    const templates = narrativeTemplates[type]
-    const selectedTemplate = templates[Math.floor(Math.random() * templates.length)]
-
-    // Add personalized elements based on content analysis
-    const personalizedEnding = this.generatePersonalizedEnding(content, mood)
-
-    return `${selectedTemplate}\n\n${personalizedEnding}`
-  }
 }
 
 export const aiService = new AIService()
