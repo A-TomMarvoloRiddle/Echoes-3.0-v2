@@ -158,9 +158,6 @@ const translations = {
     deleteAllDesc: "Elimina permanentemente todas tus entradas de diario, datos de progreso e información de cuenta. Esta acción no se puede deshacer.",
     saveAll: "Guardar toda la configuración",
   },
-  fr: {
-    // ...French translations...
-  },
   hi: {
     settings: "सेटिंग्स",
     customize: "अपना Echoes अनुभव और सुरक्षा प्राथमिकताएँ अनुकूलित करें",
@@ -224,6 +221,7 @@ const translations = {
     deleteAllDesc: "अपने सभी जर्नल प्रविष्टियाँ, प्रगति डेटा और खाता जानकारी स्थायी रूप से हटाएँ। यह क्रिया पूर्ववत नहीं की जा सकती।",
     saveAll: "सभी सेटिंग्स सहेजें",
   },
+  fr: {
     settings: "Paramètres",
     customize: "Personnalisez votre expérience Echoes et vos préférences de sécurité",
     privacy: "Confidentialité et Sécurité",
