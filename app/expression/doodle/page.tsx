@@ -232,7 +232,16 @@ export default function DoodleJournalPage() {
                       <SelectItem value="peaceful">🌸 Peaceful</SelectItem>
                       <SelectItem value="chaotic">🌪️ Chaotic</SelectItem>
                       <SelectItem value="joyful">☀️ Joyful</SelectItem>
+                      <SelectItem value="happy">😊 Happy</SelectItem>
+                      <SelectItem value="happy2">😁 Very Happy</SelectItem>
+                      <SelectItem value="overwhelmed">😵‍💫 Overwhelmed</SelectItem>
                       <SelectItem value="melancholy">🌧️ Melancholy</SelectItem>
+                      <SelectItem value="sad">😢 Sad</SelectItem>
+                      <SelectItem value="angry">😠 Angry</SelectItem>
+                      <SelectItem value="anxious">😰 Anxious</SelectItem>
+                      <SelectItem value="anxious2">🥶 Very Anxious</SelectItem>
+                      <SelectItem value="lonely">🥺 Lonely</SelectItem>
+                      <SelectItem value="confused">😕 Confused</SelectItem>
                       <SelectItem value="energetic">⚡ Energetic</SelectItem>
                       <SelectItem value="contemplative">🌙 Contemplative</SelectItem>
                       <SelectItem value="free">🦋 Free</SelectItem>
