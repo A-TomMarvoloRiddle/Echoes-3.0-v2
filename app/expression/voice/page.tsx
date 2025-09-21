@@ -429,9 +429,6 @@ export default function VoiceJournalPage() {
                         "Save Entry"
                       )}
                     </Button>
-                    <Button variant="outline" className="flex-1 bg-transparent">
-                      Share Anonymously
-                    </Button>
                   </div>
                 </CardContent>
               </Card>

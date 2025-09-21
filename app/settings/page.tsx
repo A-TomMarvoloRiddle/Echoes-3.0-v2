@@ -786,20 +786,6 @@ export default function SettingsPage() {
                       </Button>
                     </CardContent>
                   </Card>
-
-                  <Card className="bg-background/50">
-                    <CardContent className="p-4 text-center">
-                      <Heart className="h-8 w-8 text-accent mx-auto mb-3" />
-                      <h3 className="font-heading font-semibold mb-2">Share Your Story</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {t("shareDesc", settings.language)}
-                      </p>
-                      <Button variant="outline" className="w-full bg-transparent">
-                        <Heart className="mr-2 h-4 w-4" />
-                        Share Anonymously
-                      </Button>
-                    </CardContent>
-                  </Card>
                 </div>
 
                 <Card className="bg-destructive/5 border border-destructive/20">

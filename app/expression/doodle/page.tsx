@@ -288,9 +288,6 @@ export default function DoodleJournalPage() {
                     <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground">
                       Save Entry
                     </Button>
-                    <Button variant="outline" className="flex-1 bg-transparent">
-                      Share Art
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
