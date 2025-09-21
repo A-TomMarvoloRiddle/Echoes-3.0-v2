@@ -42,24 +42,40 @@ const mockResponses = {
     "I want you to know that I love you no matter what you're going through. What kind of support would be most helpful right now?",
     "Thank you for trusting me with this. I may not have all the answers, but we'll figure this out together. What's been the hardest part for you?",
     "I'm proud of you for speaking up about this. It takes courage. How long have you been carrying this alone?",
+    "I wish I could take away your pain, but I'm here to listen and help however I can. Would you like a hug or just someone to sit with you?",
+    "Sometimes I worry I might say the wrong thing, but I want you to know I'm always here for you. Is there anything you wish I understood better?",
+    "You don't have to go through this alone. Let's talk about what might help, even if it's just a small step.",
+    "If you ever just want to sit quietly together, that's okay too. I'm proud of you for opening up."
   ],
   friend: [
     "Thank you for being here for me. I've been feeling really lost lately and wasn't sure who to talk to.",
     "It means so much that you noticed something was wrong. I've been trying to hide it, but it's been really hard.",
     "I'm scared to talk about this, but I trust you. I just don't know what to do anymore.",
     "You're such a good friend for asking. I've been struggling but didn't want to burden anyone.",
+    "Honestly, I didn't want to seem weak, but I feel better just saying it out loud. Can we hang out soon?",
+    "Sometimes I just need someone to listen, even if you don't have advice. Thanks for being that person.",
+    "I appreciate you checking in. It helps more than you know. Want to go for a walk or grab coffee?",
+    "I wish I could explain everything, but it's complicated. Thanks for not judging me."
   ],
   teacher: [
     "I appreciate you coming to me with this. Student wellbeing is very important to me. What's been going on?",
     "Thank you for being honest about your situation. Let's see what accommodations we can arrange to help you succeed.",
     "I'm glad you felt comfortable approaching me. Many students go through similar challenges. How can I best support you?",
     "Your academic success matters, but your mental health comes first. What resources do you think would be most helpful?",
+    "If you ever need a break or someone to talk to, my door is always open. Would you like to speak with the counselor?",
+    "It's okay to ask for extensions or extra help. You're not alone in this. Is there a class that's been especially tough?",
+    "I care about your progress, but I care about you as a person even more. Let's make a plan together.",
+    "Thank you for trusting me. Remember, it's brave to ask for help."
   ],
   counselor: [
     "I'm glad you decided to come in today. What brought you here, and what would you like to work on together?",
     "Thank you for sharing that with me. It sounds like you've been carrying a lot. How has this been affecting your daily life?",
     "I hear that you're struggling, and I want you to know this is a safe space. What feels most important to talk about right now?",
     "It takes strength to reach out for help. Can you tell me more about what's been on your mind lately?",
+    "Sometimes just naming our feelings can help. Would you like to try that together?",
+    "Is there a time of day or situation when things feel especially hard? Let's explore that if you're comfortable.",
+    "You don't have to have all the answers right now. We can take things one step at a time.",
+    "If you ever feel overwhelmed, remember you can always reach out. What helps you feel safe or calm?"
   ],
 }
 
