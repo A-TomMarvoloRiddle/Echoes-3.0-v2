@@ -125,7 +125,7 @@ Echoes is a comprehensive AI platform that empowers youth to face mental health 
 # 🚀 Deployment
 
 ## Production Deployment
-- [*Echoes*](https://v0-ai-emotional-companion-eight.vercel.app/)
+### [*Echoes*](https://echoes-emotional-support-eight.vercel.app/)
 - **Platform:** Vercel (recommended for serverless Next.js apps)
 - **Environment Variables:**
 	- `ANTHROPIC_API_KEY` – API key for Anthropic Claude
