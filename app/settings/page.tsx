@@ -72,6 +72,13 @@ export default function SettingsPage() {
     }
   }, [setTheme])
 
+  // Sync theme state with settings state
+  useEffect(() => {
+    if (theme) {
+      setSettings(prev => ({ ...prev, theme }))
+    }
+  }, [theme])
+
   const updateSetting = (key: string, value: any) => {
     const newSettings = { ...settings, [key]: value }
     setSettings(newSettings)
@@ -338,34 +345,67 @@ export default function SettingsPage() {
                 <CardDescription>Customize how Echoes looks and behaves</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <Label htmlFor="theme">Theme</Label>
-                    <Select value={settings.theme} onValueChange={(value) => updateSetting("theme", value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="light">
-                          <div className="flex items-center gap-2">
-                            <Sun className="h-4 w-4" />
-                            Light
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <Label className="text-base font-medium">Theme</Label>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Sun className="h-5 w-5 text-yellow-500" />
+                          <div className="space-y-1">
+                            <Label htmlFor="light-theme" className="font-medium">
+                              Light Theme
+                            </Label>
+                            <p className="text-sm text-muted-foreground">
+                              Use light theme for better visibility in bright environments
+                            </p>
                           </div>
-                        </SelectItem>
-                        <SelectItem value="dark">
-                          <div className="flex items-center gap-2">
-                            <Moon className="h-4 w-4" />
-                            Dark
+                        </div>
+                        <Switch
+                          id="light-theme"
+                          checked={settings.theme === "light"}
+                          onCheckedChange={(checked) => checked && updateSetting("theme", "light")}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Moon className="h-5 w-5 text-blue-500" />
+                          <div className="space-y-1">
+                            <Label htmlFor="dark-theme" className="font-medium">
+                              Dark Theme
+                            </Label>
+                            <p className="text-sm text-muted-foreground">
+                              Use dark theme to reduce eye strain in low light
+                            </p>
                           </div>
-                        </SelectItem>
-                        <SelectItem value="auto">
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4" />
-                            Auto
+                        </div>
+                        <Switch
+                          id="dark-theme"
+                          checked={settings.theme === "dark"}
+                          onCheckedChange={(checked) => checked && updateSetting("theme", "dark")}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Globe className="h-5 w-5 text-green-500" />
+                          <div className="space-y-1">
+                            <Label htmlFor="auto-theme" className="font-medium">
+                              Auto (System)
+                            </Label>
+                            <p className="text-sm text-muted-foreground">
+                              Automatically switch based on your system preference
+                            </p>
                           </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                        </div>
+                        <Switch
+                          id="auto-theme"
+                          checked={settings.theme === "system"}
+                          onCheckedChange={(checked) => checked && updateSetting("theme", "system")}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="space-y-3">
