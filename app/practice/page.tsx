@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { apiClient } from "@/lib/api-client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -62,36 +63,42 @@ const roleplayScenarios = [
   },
 ]
 
-const recentPractices = [
-  {
-    id: 1,
-    scenario: "Talk to Parent about Anxiety",
-    role: "parent",
-    confidence: { before: 3, after: 7 },
-    feedback: "Great improvement in directness. Try using 'I feel' statements more.",
-    timestamp: "2 hours ago",
-  },
-  {
-    id: 2,
-    scenario: "Support Depressed Friend",
-    role: "friend",
-    confidence: { before: 5, after: 8 },
-    feedback: "Excellent empathy shown. Remember to ask open-ended questions.",
-    timestamp: "1 day ago",
-  },
-  {
-    id: 3,
-    scenario: "Request Teacher Help",
-    role: "teacher",
-    confidence: { before: 4, after: 6 },
-    feedback: "Good progress. Practice being more specific about your needs.",
-    timestamp: "3 days ago",
-  },
-]
+function formatTimestamp(dateString: string) {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diff = (now.getTime() - date.getTime()) / 1000
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`
+  if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`
+  return date.toLocaleDateString()
+}
 
-export default function PracticeModePage() {
+export default function RoleplayPage() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
+  const [recentRoleplays, setRecentRoleplays] = useState<any[]>([])
+  const [overallConfidence, setOverallConfidence] = useState<number>(0)
+  const [sessionCount, setSessionCount] = useState<number>(0)
+  const [scenarioCount, setScenarioCount] = useState<number>(0)
   const router = useRouter()
+
+  useEffect(() => {
+    async function fetchRoleplays() {
+      try {
+        const res = await apiClient.getPracticeSessions?.() // fallback if not present
+        if (res && res.success) {
+          setRecentRoleplays(res.sessions)
+          setSessionCount(res.sessions.length)
+          setScenarioCount(new Set(res.sessions.map((s: any) => s.scenario)).size)
+          // Compute overall confidence
+          const confidences = res.sessions.map((s: any) => (s.confidenceAfter ?? s.confidenceBefore))
+          const avg = confidences.length ? confidences.reduce((a: number, b: number) => a + b, 0) / confidences.length : 0
+          setOverallConfidence(Number(avg.toFixed(1)))
+        }
+      } catch {}
+    }
+    fetchRoleplays()
+  }, [])
 
   const getColorClasses = (color: string) => {
     switch (color) {
@@ -116,7 +123,7 @@ export default function PracticeModePage() {
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-heading font-bold text-foreground">Practice Mode</h1>
+            <h1 className="text-3xl font-heading font-bold text-foreground">Roleplay</h1>
             <p className="text-muted-foreground">Build confidence through safe roleplay conversations</p>
           </div>
         </div>
@@ -218,12 +225,12 @@ export default function PracticeModePage() {
               </Card>
             )}
 
-            {/* Recent Practice Sessions */}
+            {/* Recent Roleplay Sessions */}
             <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl font-heading">Recent Practice Sessions</CardTitle>
+                    <CardTitle className="text-xl font-heading">Recent Roleplay Sessions</CardTitle>
                     <CardDescription>Your progress in building communication confidence</CardDescription>
                   </div>
                   <Button variant="outline" size="sm">
@@ -232,16 +239,16 @@ export default function PracticeModePage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {recentPractices.map((practice) => (
-                  <Card key={practice.id} className="bg-background/50 hover:bg-background/80 transition-colors">
+                {recentRoleplays.map((roleplay) => (
+                  <Card key={roleplay.id} className="bg-background/50 hover:bg-background/80 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h4 className="font-heading font-semibold">{practice.scenario}</h4>
-                          <p className="text-sm text-muted-foreground">{practice.timestamp}</p>
+                          <h4 className="font-heading font-semibold">{roleplay.scenario}</h4>
+                          <p className="text-sm text-muted-foreground">{formatTimestamp(roleplay.completedAt || roleplay.createdAt)}</p>
                         </div>
                         <Badge variant="secondary" className="capitalize">
-                          {practice.role}
+                          {roleplay.roleType}
                         </Badge>
                       </div>
 
@@ -250,20 +257,20 @@ export default function PracticeModePage() {
                           <div className="text-sm">
                             <span className="text-muted-foreground">Confidence:</span>
                             <span className="ml-2 font-medium">
-                              {practice.confidence.before}/10 → {practice.confidence.after}/10
+                              {roleplay.confidenceBefore}/10 → {roleplay.confidenceAfter ?? roleplay.confidenceBefore}/10
                             </span>
                           </div>
                           <div className="flex-1 bg-muted rounded-full h-2">
                             <div
                               className="bg-primary h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${(practice.confidence.after / 10) * 100}%` }}
+                              style={{ width: `${((roleplay.confidenceAfter ?? roleplay.confidenceBefore) / 10) * 100}%` }}
                             />
                           </div>
                         </div>
 
                         <div className="p-3 bg-primary/5 rounded-lg">
                           <p className="text-sm text-muted-foreground">
-                            <span className="font-medium">Feedback:</span> {practice.feedback}
+                            <span className="font-medium">Feedback:</span> {roleplay.feedback}
                           </p>
                         </div>
                       </div>
@@ -279,7 +286,7 @@ export default function PracticeModePage() {
             {/* Practice Tips */}
             <Card className="border-0 shadow-lg bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-lg font-heading">Practice Tips</CardTitle>
+                <CardTitle className="text-lg font-heading">Roleplay Tips</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3 text-sm">
@@ -297,7 +304,7 @@ export default function PracticeModePage() {
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                    <p className="text-muted-foreground">Practice makes progress, not perfection.</p>
+                    <p className="text-muted-foreground">Roleplay makes progress, not perfection.</p>
                   </div>
                 </div>
               </CardContent>
@@ -313,20 +320,20 @@ export default function PracticeModePage() {
                   <div>
                     <div className="flex justify-between text-sm mb-2">
                       <span>Overall Confidence</span>
-                      <span className="font-medium">7.2/10</span>
+                      <span className="font-medium">{overallConfidence}/10</span>
                     </div>
                     <div className="bg-muted rounded-full h-3">
-                      <div className="bg-primary h-3 rounded-full" style={{ width: "72%" }} />
+                      <div className="bg-primary h-3 rounded-full" style={{ width: `${(overallConfidence / 10) * 100}%` }} />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="p-3 bg-muted/30 rounded-lg">
-                      <div className="text-2xl font-heading font-bold text-primary">12</div>
+                      <div className="text-2xl font-heading font-bold text-primary">{sessionCount}</div>
                       <div className="text-xs text-muted-foreground">Sessions</div>
                     </div>
                     <div className="p-3 bg-muted/30 rounded-lg">
-                      <div className="text-2xl font-heading font-bold text-secondary">4</div>
+                      <div className="text-2xl font-heading font-bold text-secondary">{scenarioCount}</div>
                       <div className="text-xs text-muted-foreground">Scenarios</div>
                     </div>
                   </div>

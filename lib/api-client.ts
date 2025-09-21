@@ -1,5 +1,8 @@
 // API client with authentication
 export class ApiClient {
+  async getPracticeSessions(limit = 10) {
+    return this.request<{ success: boolean; sessions: any[] }>(`/practice?limit=${limit}`)
+  }
   private baseUrl: string
   private token: string | null = null
 
