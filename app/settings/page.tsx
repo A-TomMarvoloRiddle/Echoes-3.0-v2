@@ -355,6 +355,7 @@ export default function SettingsPage() {
                         className="flex items-center gap-2"
                       >
                         <Sun className="h-5 w-5 text-yellow-500" /> Light
+                        {settings.theme === "light" && <span className="ml-1">✓</span>}
                       </Button>
                       <Button
                         variant={settings.theme === "dark" ? "default" : "outline"}
@@ -362,6 +363,7 @@ export default function SettingsPage() {
                         className="flex items-center gap-2"
                       >
                         <Moon className="h-5 w-5 text-blue-500" /> Dark
+                        {settings.theme === "dark" && <span className="ml-1">✓</span>}
                       </Button>
                       <Button
                         variant={settings.theme === "system" ? "default" : "outline"}
@@ -369,6 +371,7 @@ export default function SettingsPage() {
                         className="flex items-center gap-2"
                       >
                         <Globe className="h-5 w-5 text-green-500" /> System
+                        {settings.theme === "system" && <span className="ml-1">✓</span>}
                       </Button>
                     </div>
                   </div>
