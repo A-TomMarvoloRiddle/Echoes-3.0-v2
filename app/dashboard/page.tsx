@@ -347,7 +347,7 @@ export default function DashboardPage() {
               <CardContent className="space-y-3">
                 <Button
                   className="w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground"
-                  onClick={() => router.push("/roleplay")}
+                  onClick={() => router.push("/practice/roleplay")}
                 >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Practice Conversation
