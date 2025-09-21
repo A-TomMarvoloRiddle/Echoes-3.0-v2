@@ -15,16 +15,18 @@ export interface RoleplayContext {
 }
 
 export class AIService {
-  private anthropic: Anthropic | null = null
-
-  constructor() {
-    // Initialize Anthropic client if API key is available (server-side only)
-    if (typeof window === 'undefined') {
-      const apiKey = process.env.ANTHROPIC_API_KEY
+  private static _anthropic: Anthropic | null = null;
+  private get anthropic(): Anthropic | null {
+    if (typeof window !== 'undefined') {
+      throw new Error('aiService cannot be used on the client. Use it only in API routes or server actions.');
+    }
+    if (!AIService._anthropic) {
+      const apiKey = process.env.ANTHROPIC_API_KEY;
       if (apiKey) {
-        this.anthropic = new Anthropic({ apiKey })
+        AIService._anthropic = new Anthropic({ apiKey });
       }
     }
+    return AIService._anthropic;
   }
 
   // Generate healing narrative from journal content
