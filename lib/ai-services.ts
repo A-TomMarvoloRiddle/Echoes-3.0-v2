@@ -41,7 +41,7 @@ export class AIService {
       const prompt = this.buildNarrativePrompt(content, mood, emotions, type)
 
       const response = await this.anthropic.messages.create({
-        model: "claude-3-sonnet-20240229",
+        model: "Claude Sonnet 3.5 2024-10-22",
         max_tokens: 400,
         temperature: 0.7,
         system: "You are a compassionate AI therapist and mental health companion. Your role is to help users process their emotions through personalized, empathetic narratives. Always respond with kindness, validation, and gentle insights. Focus on emotional healing, self-compassion, and growth.",
