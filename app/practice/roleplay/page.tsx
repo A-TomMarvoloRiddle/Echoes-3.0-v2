@@ -17,7 +17,7 @@ const ROLES = [
   { value: "custom", label: "Custom" },
 ]
 
-export default function PracticeRoleplayPage() {
+export default function RoleplayPage() {
   const [step, setStep] = useState<"setup" | "chat" | "feedback">("setup")
   const [role, setRole] = useState(ROLES[0].value)
   const [customRole, setCustomRole] = useState("")
@@ -27,6 +27,8 @@ export default function PracticeRoleplayPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [feedback, setFeedback] = useState<string>("")
   const [hints, setHints] = useState<string[]>([])
+  const [confidenceBefore, setConfidenceBefore] = useState<number>(5)
+  const [confidenceAfter, setConfidenceAfter] = useState<number>(7)
 
   // Start roleplay
   const handleStart = () => {
@@ -46,17 +48,17 @@ export default function PracticeRoleplayPage() {
   // Send user message and get AI response
   const handleSend = async () => {
     if (!userInput.trim()) return
-    const newMessages = [...messages, { sender: "user", content: userInput }]
-  setMessages(newMessages as { sender: "user" | "ai"; content: string }[])
+    const newMessages = [...messages, { sender: "user" as const, content: userInput }]
+    setMessages(newMessages)
     setUserInput("")
     setIsLoading(true)
     try {
       const res = await apiClient.generateRoleplayResponse({
         roleType: role,
         scenario: role === "custom" ? customRole : role,
-        conversationHistory: newMessages,
+        conversationHistory: newMessages as { sender: "user" | "ai"; content: string }[],
       }, userInput)
-  setMessages([...newMessages, { sender: "ai" as const, content: res.response }] as { sender: "user" | "ai"; content: string }[])
+      setMessages([...newMessages, { sender: "ai" as const, content: res.response }])
     } catch (e) {
   setMessages([...newMessages, { sender: "ai" as const, content: "Sorry, something went wrong." }] as { sender: "user" | "ai"; content: string }[])
     } finally {
@@ -64,14 +66,26 @@ export default function PracticeRoleplayPage() {
     }
   }
 
-  // Get feedback from AI
+  // Get feedback from AI and save session
   const handleFeedback = async () => {
     setIsLoading(true)
     try {
-      const res = await apiClient.generateSessionFeedback(messages, 5, 7) // Example confidence
+      // Get feedback from AI
+      const res = await apiClient.generateSessionFeedback(messages, confidenceBefore, confidenceAfter)
       setFeedback(res.feedback)
       setHints(res.tips)
       setStep("feedback")
+
+      // Save completed roleplay session to backend
+      await apiClient.createPracticeSession({
+        roleType: role,
+        scenario: role === "custom" ? customRole : scenario,
+        confidenceBefore,
+        confidenceAfter,
+        messages,
+        feedback: res.feedback,
+        tips: res.tips,
+      })
     } catch (e) {
       setFeedback("Sorry, could not get feedback.")
       setHints([])
@@ -97,17 +111,17 @@ export default function PracticeRoleplayPage() {
       <Card className="max-w-2xl w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-primary" /> Practice Roleplay Conversation
+            <Sparkles className="h-6 w-6 text-primary" /> Roleplay Conversation
           </CardTitle>
           <CardDescription>
-            Practice difficult conversations with an AI roleplay partner. Get feedback and try again to build confidence.
+            Build confidence through safe roleplay conversations with an AI partner. Get feedback and try again to improve.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {step === "setup" && (
             <div className="space-y-4">
               <div>
-                <label className="font-medium">Who do you want to practice with?</label>
+                <label className="font-medium">Who do you want to roleplay with?</label>
                 <Select value={role} onValueChange={setRole}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a role" />
@@ -176,7 +190,7 @@ export default function PracticeRoleplayPage() {
           {step === "feedback" && (
             <div className="space-y-4">
               <div className="bg-muted/30 rounded-lg p-4">
-                <div className="font-semibold mb-2">AI Feedback</div>
+                <div className="font-semibold mb-2">AI Suggestion</div>
                 <div className="mb-2 text-sm">{feedback}</div>
                 {hints.length > 0 && (
                   <ul className="list-disc pl-5 text-sm text-muted-foreground">
@@ -185,6 +199,14 @@ export default function PracticeRoleplayPage() {
                     ))}
                   </ul>
                 )}
+                <div className="mt-4">
+                  <div className="text-sm mb-1 font-medium">Your Confidence (before → after):</div>
+                  <div className="flex gap-2 items-center">
+                    <input type="number" min={1} max={10} value={confidenceBefore} onChange={e => setConfidenceBefore(Number(e.target.value))} className="w-12 border rounded px-1" />
+                    <span>→</span>
+                    <input type="number" min={1} max={10} value={confidenceAfter} onChange={e => setConfidenceAfter(Number(e.target.value))} className="w-12 border rounded px-1" />
+                  </div>
+                </div>
               </div>
               <Button onClick={handleRetry} className="w-full flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" /> Try Again
