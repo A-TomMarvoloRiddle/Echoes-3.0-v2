@@ -348,63 +348,28 @@ export default function SettingsPage() {
                 <div className="space-y-6">
                   <div className="space-y-4">
                     <Label className="text-base font-medium">Theme</Label>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Sun className="h-5 w-5 text-yellow-500" />
-                          <div className="space-y-1">
-                            <Label htmlFor="light-theme" className="font-medium">
-                              Light Theme
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                              Use light theme for better visibility in bright environments
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          id="light-theme"
-                          checked={settings.theme === "light"}
-                          onCheckedChange={(checked) => checked && updateSetting("theme", "light")}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Moon className="h-5 w-5 text-blue-500" />
-                          <div className="space-y-1">
-                            <Label htmlFor="dark-theme" className="font-medium">
-                              Dark Theme
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                              Use dark theme to reduce eye strain in low light
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          id="dark-theme"
-                          checked={settings.theme === "dark"}
-                          onCheckedChange={(checked) => checked && updateSetting("theme", "dark")}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Globe className="h-5 w-5 text-green-500" />
-                          <div className="space-y-1">
-                            <Label htmlFor="auto-theme" className="font-medium">
-                              Auto (System)
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                              Automatically switch based on your system preference
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          id="auto-theme"
-                          checked={settings.theme === "system"}
-                          onCheckedChange={(checked) => checked && updateSetting("theme", "system")}
-                        />
-                      </div>
+                    <div className="flex gap-4">
+                      <Button
+                        variant={settings.theme === "light" ? "default" : "outline"}
+                        onClick={() => updateSetting("theme", "light")}
+                        className="flex items-center gap-2"
+                      >
+                        <Sun className="h-5 w-5 text-yellow-500" /> Light
+                      </Button>
+                      <Button
+                        variant={settings.theme === "dark" ? "default" : "outline"}
+                        onClick={() => updateSetting("theme", "dark")}
+                        className="flex items-center gap-2"
+                      >
+                        <Moon className="h-5 w-5 text-blue-500" /> Dark
+                      </Button>
+                      <Button
+                        variant={settings.theme === "system" ? "default" : "outline"}
+                        onClick={() => updateSetting("theme", "system")}
+                        className="flex items-center gap-2"
+                      >
+                        <Globe className="h-5 w-5 text-green-500" /> System
+                      </Button>
                     </div>
                   </div>
 
