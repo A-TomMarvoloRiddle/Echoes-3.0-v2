@@ -16,6 +16,35 @@ export interface RoleplayContext {
 
 
 class AIService {
+  // Generate a narrative using Claude API
+  async generateNarrative({ content, mood, emotions, type }: NarrativeRequest): Promise<string> {
+    if (!this.anthropic) {
+      console.warn('Anthropic API key not found, falling back to mock narrative response');
+      return `Here's a narrative based on your input: "${content}" (mock)`;
+    }
+
+    try {
+      // Compose a prompt for narrative generation
+      const prompt = `You are Echoes, an empathetic AI guide for youth. Generate a supportive, engaging & healing story or poem based on the following journal entry.\n\nEntry: "${content}"\nMood: ${mood}\nEmotions: ${emotions && emotions.length > 0 ? emotions.join(", ") : "none specified"}\nType: ${type}.\n\nRespond with a short, encouraging narrative that helps the user reflect and feel understood. Avoid repeating the entry verbatim.`;
+
+      const response = await this.anthropic.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 300,
+        temperature: 0.7,
+        system: `You are Echoes, an AI narrative generator for youth journaling. Respond with empathy, encouragement, and insight.`,
+        messages: [
+          { role: "user", content: prompt }
+        ]
+      });
+
+      const textBlock = response.content.find((block: any) => block.type === 'text');
+      const generatedText = textBlock ? (textBlock as any).text : '';
+      return generatedText;
+    } catch (error) {
+      console.error('Anthropic API error (narrative):', error);
+      return `Sorry, I couldn't generate a narrative right now.`;
+    }
+  }
   anthropic: Anthropic | null;
   constructor() {
     this.anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
