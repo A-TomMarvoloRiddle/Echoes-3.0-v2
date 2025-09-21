@@ -1,3 +1,24 @@
+  // Roleplay AI methods
+  async generateRoleplayResponse(
+    context: { roleType: "parent" | "friend" | "teacher" | "counselor" | string; scenario: string; conversationHistory: { sender: "user" | "ai"; content: string }[] },
+    userMessage: string
+  ) {
+    return this.request<{ success: boolean; response: string }>("/ai/roleplay", {
+      method: "POST",
+      body: JSON.stringify({ ...context, userMessage }),
+    })
+  }
+
+  async generateSessionFeedback(
+    messages: { sender: "user" | "ai"; content: string }[],
+    confidenceBefore: number,
+    confidenceAfter: number
+  ) {
+    return this.request<{ success: boolean; feedback: string; tips: string[] }>("/ai/session-feedback", {
+      method: "POST",
+      body: JSON.stringify({ messages, confidenceBefore, confidenceAfter }),
+    })
+  }
 // API client with authentication
 export class ApiClient {
   private baseUrl: string
@@ -178,6 +199,28 @@ export class ApiClient {
   }
 
   // Crisis detection methods
+
+    // Roleplay AI methods
+    async generateRoleplayResponse(
+      context: { roleType: "parent" | "friend" | "teacher" | "counselor" | string; scenario: string; conversationHistory: { sender: "user" | "ai"; content: string }[] },
+      userMessage: string
+    ) {
+      return this.request<{ success: boolean; response: string }>("/ai/roleplay", {
+        method: "POST",
+        body: JSON.stringify({ ...context, userMessage }),
+      })
+    }
+
+    async generateSessionFeedback(
+      messages: { sender: "user" | "ai"; content: string }[],
+      confidenceBefore: number,
+      confidenceAfter: number
+    ) {
+      return this.request<{ success: boolean; feedback: string; tips: string[] }>("/ai/session-feedback", {
+        method: "POST",
+        body: JSON.stringify({ messages, confidenceBefore, confidenceAfter }),
+      })
+    }
   async analyzeCrisisRisk(text: string, context?: string) {
     return this.request<{
       success: boolean
