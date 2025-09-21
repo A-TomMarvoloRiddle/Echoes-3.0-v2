@@ -38,34 +38,43 @@ const roleData = {
 
 const mockResponses = {
   parent: [
-    "I'm so glad you felt comfortable talking to me about this. Can you tell me more about when you started feeling this way?",
-    "I want you to know that I love you no matter what you're going through. What kind of support would be most helpful right now?",
-    "Thank you for trusting me with this. I may not have all the answers, but we'll figure this out together. What's been the hardest part for you?",
-    "I'm proud of you for speaking up about this. It takes courage. How long have you been carrying this alone?",
-    "I wish I could take away your pain, but I'm here to listen and help however I can. Would you like a hug or just someone to sit with you?",
-    "Sometimes I worry I might say the wrong thing, but I want you to know I'm always here for you. Is there anything you wish I understood better?",
-    "You don't have to go through this alone. Let's talk about what might help, even if it's just a small step.",
-    "If you ever just want to sit quietly together, that's okay too. I'm proud of you for opening up."
+    "Beta, you know you can talk to me about anything. I may not always understand, but I will always try.",
+    "Are you eating properly? Sometimes when you are stressed, you forget to eat. Tell me, what is troubling you?",
+    "I know studies can be tough, but your health is more important. Let's sit and talk, no pressure.",
+    "You are my child, and I will always support you. If you ever feel sad, come to me, we will find a way together.",
+    "Don't worry about what others will say. Your happiness matters to me more than anything else.",
+    "If you need a break, take it. Life is not a race. I am proud of you, no matter what.",
+    "Sometimes I get strict, but it is only because I care. Tell me honestly, what is making you feel this way?",
+    "We can go for a walk or have chai together if you want to talk. I am always here for you.",
+    "You are not alone, beta. We are a family, and we will face everything together.",
+    "If you want, I can sit with you quietly. Sometimes, silence helps more than words.",
+    "Remember, mistakes happen. Learn from them and move forward. I am with you every step.",
+    "If you want to talk to someone else, I can help you find a counselor. Your feelings are important.",
+    "I may not have all the answers, but I will never stop trying to help you."
   ],
   friend: [
-    "Thank you for being here for me. I've been feeling really lost lately and wasn't sure who to talk to.",
-    "It means so much that you noticed something was wrong. I've been trying to hide it, but it's been really hard.",
-    "I'm scared to talk about this, but I trust you. I just don't know what to do anymore.",
-    "You're such a good friend for asking. I've been struggling but didn't want to burden anyone.",
-    "Honestly, I didn't want to seem weak, but I feel better just saying it out loud. Can we hang out soon?",
-    "Sometimes I just need someone to listen, even if you don't have advice. Thanks for being that person.",
-    "I appreciate you checking in. It helps more than you know. Want to go for a walk or grab coffee?",
-    "I wish I could explain everything, but it's complicated. Thanks for not judging me."
+    "Hey, thanks for checking in. I didn't realize how much I needed to talk until now.",
+    "You always know when something's up. I appreciate you just being here, even if I don't say much.",
+    "Can we just hang out and not talk about anything serious for a while? Sometimes I need a distraction.",
+    "I feel like I'm always the one venting, but you never complain. You're a true friend.",
+    "It's hard to open up, but I trust you. Thanks for not making me feel weird about it.",
+    "Sometimes I just want someone to listen, not fix things. You're really good at that.",
+    "Want to go for a walk or get some chai? I think fresh air would help.",
+    "I wish I could explain everything, but it's complicated. Thanks for not judging me.",
+    "You make me laugh even when I'm down. That's a superpower.",
+    "If you ever need to talk, I'm here for you too."
   ],
   teacher: [
-    "I appreciate you coming to me with this. Student wellbeing is very important to me. What's been going on?",
-    "Thank you for being honest about your situation. Let's see what accommodations we can arrange to help you succeed.",
-    "I'm glad you felt comfortable approaching me. Many students go through similar challenges. How can I best support you?",
-    "Your academic success matters, but your mental health comes first. What resources do you think would be most helpful?",
-    "If you ever need a break or someone to talk to, my door is always open. Would you like to speak with the counselor?",
-    "It's okay to ask for extensions or extra help. You're not alone in this. Is there a class that's been especially tough?",
-    "I care about your progress, but I care about you as a person even more. Let's make a plan together.",
-    "Thank you for trusting me. Remember, it's brave to ask for help."
+    "Thank you for coming to me. I want you to know your feelings are valid and important.",
+    "If you need extra time for assignments, just let me know. Your wellbeing comes first.",
+    "Many students go through tough times. You're not alone, and I'm here to help however I can.",
+    "Would you like to talk to the school counselor? Sometimes it helps to have another person to support you.",
+    "If you ever feel overwhelmed, you can always take a break. Your mental health matters.",
+    "Is there a particular class or subject that's causing stress? We can work together to make it easier.",
+    "You are brave for speaking up. Let's make a plan that works for you, not just for grades.",
+    "If you need a quiet space or someone to listen, my door is open.",
+    "Remember, asking for help is a sign of strength, not weakness.",
+    "Thank you for trusting me. We'll figure this out together."
   ],
   counselor: [
     "I'm glad you decided to come in today. What brought you here, and what would you like to work on together?",
@@ -75,7 +84,11 @@ const mockResponses = {
     "Sometimes just naming our feelings can help. Would you like to try that together?",
     "Is there a time of day or situation when things feel especially hard? Let's explore that if you're comfortable.",
     "You don't have to have all the answers right now. We can take things one step at a time.",
-    "If you ever feel overwhelmed, remember you can always reach out. What helps you feel safe or calm?"
+    "If you ever feel overwhelmed, remember you can always reach out. What helps you feel safe or calm?",
+    "Would you like to try a breathing exercise together? Sometimes it helps to slow down and focus on the present.",
+    "Is there someone in your life who supports you? How do they help when things get tough?",
+    "What do you wish people understood about what you're going through?",
+    "If you want, we can talk about strategies for coping with stress or anxiety."
   ],
 }
 

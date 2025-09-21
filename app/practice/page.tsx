@@ -23,6 +23,16 @@ const roleplayScenarios = [
     ],
   },
   {
+    id: "roleplay",
+    title: "Roleplay Conversation",
+    description: "Custom roleplay with any person or scenario. Get feedback and improve.",
+    icon: MessageCircle,
+    color: "accent",
+    scenarios: [
+      "Create your own scenario and roleplay with AI."
+    ],
+  },
+  {
     id: "friend",
     title: "Support a Friend",
     description: "Learn how to help friends who are going through tough times",
